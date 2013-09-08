@@ -1,6 +1,8 @@
 require 'fileutils'
 require 'digest'
 require 'json'
+require 'openssl'
+require 'zip'
 
 class PushPackageGenerator
   def initialize(user_id)
@@ -45,14 +47,29 @@ class PushPackageGenerator
 
   def sign_files
     Rails.logger.debug "signing the the manifest"
+    data = File.read(File.join(temp_dir, 'manifest.json'))
+    crt_file = File.join(Rails.root, "config", "push_certificate.p12")
+    crt = OpenSSL::PKCS12.new File.read(crt_file)
+    key = ""
+    signature = OpenSSL::PKCS7::sign(crt.certificate, crt.key, data, [], OpenSSL::PKCS7::DETACHED)
+    File.open(File.join(temp_dir, "signature"), "w:ASCII-8BIT") { |file| file.write signature.to_der }
   end
 
   def zip_files
     Rails.logger.debug "generating the zip"
+    zipfile_name = "#{temp_dir}.zip"
+    Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+      Dir.glob("#{temp_dir}/**/*").each do |file|
+        title = Pathname.new(file).relative_path_from(Pathname.new(temp_dir))
+        Rails.logger.debug "archiving #{title}"
+        zipfile.add(title, file)
+      end
+
+    end
   end
 
   def clean
     Rails.logger.debug "cleaning"
-    # FileUtils.rm_rf temp_dir
+    FileUtils.rm_rf temp_dir
   end
 end

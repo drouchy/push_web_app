@@ -35,3 +35,6 @@ group :test do
   gem 'email_spec'
   gem 'launchy'
 end
+
+# push notifications dependencies
+gem "rubyzip", "~> 1.0.0"
