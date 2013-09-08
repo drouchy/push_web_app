@@ -43,7 +43,7 @@ class PushPackageGenerator
     end
 
     File.open(File.join(temp_dir, "manifest.json"), "w") do |file|
-      file.write JSON.pretty_generate checksums
+      file.write JSON.generate(checksums).gsub('/','\\/')
     end
   end
 
@@ -54,7 +54,10 @@ class PushPackageGenerator
     crt = OpenSSL::PKCS12.new File.read(crt_file)
     key = ""
     signature = OpenSSL::PKCS7::sign(crt.certificate, crt.key, data, [], OpenSSL::PKCS7::DETACHED)
-    File.open(File.join(temp_dir, "signature"), "w:ASCII-8BIT") { |file| file.write Base64.decode64 signature.to_s }
+    signature = signature.to_s.split("\n")
+    signature = signature[1..signature.length-2].join("\n")
+    Rails.logger.debug signature.to_s
+    File.open(File.join(temp_dir, "signature"), "wb") { |file| file.write Base64.decode64 signature.to_s }
   end
 
   def zip_files

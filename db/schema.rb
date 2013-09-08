@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(version: 20130907174246) do
     t.datetime "updated_at"
     t.string   "name"
     t.boolean  "push_notifications"
+    t.string   "device_token"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true

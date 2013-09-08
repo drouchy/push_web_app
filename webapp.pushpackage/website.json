@@ -1,8 +1,8 @@
 {
     "websiteName": "Push Web App example",
     "websitePushID": "web.com.example.app",
-    "allowedDomains": ["http://localhost"],
-    "urlFormatString": "http://localhost:3000/articles/%@",
+    "allowedDomains": ["http://www.weloveapis.com", "https://www.weloveapis.com"],
+    "urlFormatString": "http://www.weloveapis.com/articles/%@",
     "authenticationToken": "19f8d7a6e9fb8a7f6d9330dabe",
-    "webServiceURL": "https://localhost:3000/push"
+    "webServiceURL": "https://www.weloveapis.com/push"
 }

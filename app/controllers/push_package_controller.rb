@@ -9,4 +9,13 @@ class PushPackageController < ApplicationController
     Rails.logger.info "File generated: #{file}"
     send_file file
   end
+
+  def register
+    Rails.logger.info "registring the push notification"
+    # Rails.logger.info request.headers.entries
+    user = User.first
+    user.device_token = params[:device_id]
+    user.save!
+    render nothing: true
+  end
 end

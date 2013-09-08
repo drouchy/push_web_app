@@ -4,5 +4,7 @@ class LoggerController < ApplicationController
   def create
     message = JSON.parse request.body.read
     Rails.logger.debug "error from safari push notification\n #{JSON.pretty_generate message}"
+
+    render nothing: true
   end
 end
