@@ -3,6 +3,7 @@ require 'digest'
 require 'json'
 require 'openssl'
 require 'zip'
+require 'base64'
 
 class PushPackageGenerator
   def initialize(user_id)
@@ -14,8 +15,9 @@ class PushPackageGenerator
     copy_files_to_temp
     checksum_files
     sign_files
-    zip_files
+    file = zip_files
     clean
+    file
   end
 
   private
@@ -52,12 +54,13 @@ class PushPackageGenerator
     crt = OpenSSL::PKCS12.new File.read(crt_file)
     key = ""
     signature = OpenSSL::PKCS7::sign(crt.certificate, crt.key, data, [], OpenSSL::PKCS7::DETACHED)
-    File.open(File.join(temp_dir, "signature"), "w:ASCII-8BIT") { |file| file.write signature.to_der }
+    File.open(File.join(temp_dir, "signature"), "w:ASCII-8BIT") { |file| file.write Base64.decode64 signature.to_s }
   end
 
   def zip_files
     Rails.logger.debug "generating the zip"
-    zipfile_name = "#{temp_dir}.zip"
+    zipfile_name = "#{Rails.root}/tmp/#{user_id}_pushpackage.zip"
+    FileUtils.rm_f zipfile_name
     Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
       Dir.glob("#{temp_dir}/**/*").each do |file|
         title = Pathname.new(file).relative_path_from(Pathname.new(temp_dir))
@@ -66,6 +69,7 @@ class PushPackageGenerator
       end
 
     end
+    zipfile_name
   end
 
   def clean
