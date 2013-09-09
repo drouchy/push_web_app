@@ -12,7 +12,7 @@ class PushPackageController < ApplicationController
 
   def register
     Rails.logger.info "registring the push notification"
-    # Rails.logger.info request.headers.entries
+    Rails.logger.info request.headers['Authorization']
     user = User.first
     user.device_token = params[:device_id]
     user.save!

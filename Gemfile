@@ -40,3 +40,4 @@ end
 
 # push notifications dependencies
 gem "rubyzip", "~> 1.0.0"
+gem "apns", "~> 1.1.0"
